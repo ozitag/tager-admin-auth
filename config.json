@@ -5,6 +5,10 @@
   "apiUrl": "http://localhost:7001/api",
   "logo": "logo.svg",
   "pageTitle": "[DEV] Ведаем - Панель Управления",
+  "colors": {
+    "bodyBackground": "#000",
+    "formBackground": "#333"
+  },
   "authGoogle": {
     "enabled": true,
     "clientId": "160741798000-ea810gam1vull18b3a1dori585hpe0br.apps.googleusercontent.com"

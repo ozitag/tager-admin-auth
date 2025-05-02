@@ -1,27 +1,29 @@
 <template>
   <div class="inner">
-    <div :class="{form: true, dark: isDark}">
-      <div :class="{loader: true, light: !isDark}" v-if="loading">
-       <div></div><div></div><div></div><div></div>
+    <div :class="{ form: true, dark: isDark }" :style="{ backgroundColor }">
+      <div :class="{ loader: true, light: !isDark }" v-if="loading">
+        <div></div>
+        <div></div>
+        <div></div>
+        <div></div>
       </div>
-      <GoogleButton v-if="withGoogle" @start="resetError" @error="onError" @success="onSuccess"/>
-      <YandexButton v-if="withYandex"/>
+      <GoogleButton v-if="withGoogle" @start="resetError" @error="onError" @success="onSuccess" />
+      <YandexButton v-if="withYandex" />
     </div>
-    <span :class="{error, visible:error!==null}">{{ error }}</span>
+    <span :class="{ error, visible: error !== null }">{{ error }}</span>
   </div>
 </template>
 
 <script lang="ts">
-import GoogleButton from './components/GoogleButton.vue';
-import {onMounted, ref} from "vue";
-import {useConfig} from "@/config";
-import YandexButton from "@/Form/components/YandexButton.vue";
-import axios from "axios";
-
+import GoogleButton from './components/GoogleButton.vue'
+import { onMounted, ref } from 'vue'
+import { useConfig } from '@/config'
+import YandexButton from '@/Form/components/YandexButton.vue'
+import axios from 'axios'
 
 export default {
   name: 'Form',
-  components: {YandexButton, GoogleButton},
+  components: { YandexButton, GoogleButton },
   props: {
     yandexAccessToken: {
       type: String,
@@ -29,58 +31,66 @@ export default {
     }
   },
   setup(props: any) {
-    const {basePath, theme, apiUrl, authYandex, authGoogle} = useConfig();
-    const loading = ref<boolean>(false);
+    const { basePath, theme, apiUrl, authYandex, authGoogle, colors } = useConfig()
+    const loading = ref<boolean>(false)
 
-    const error = ref<string | null>(null);
+    const error = ref<string | null>(null)
 
     const onError = (errorMessage: string) => {
-      error.value = errorMessage;
+      error.value = errorMessage
     }
 
-    const resetError = () => error.value = null;
+    const resetError = () => (error.value = null)
 
     const onSuccess = (data: any) => {
-      localStorage.setItem("admin_access_token", data.accessToken);
+      localStorage.setItem('admin_access_token', data.accessToken)
 
       setTimeout(() => {
-        let redirectUrl = basePath.startsWith('https://') || basePath.startsWith('http://') ? basePath : window.location.origin + basePath;
+        let redirectUrl =
+          basePath.startsWith('https://') || basePath.startsWith('http://')
+            ? basePath
+            : window.location.origin + basePath
         if (redirectUrl.endsWith('/')) {
-          redirectUrl = redirectUrl.slice(0, redirectUrl.length - 1);
+          redirectUrl = redirectUrl.slice(0, redirectUrl.length - 1)
         }
 
-        window.location.href = redirectUrl.length > 0 ? redirectUrl.slice(0, redirectUrl.lastIndexOf('/')) : '/admin';
-      }, 100);
+        window.location.href =
+          redirectUrl.length > 0 ? redirectUrl.slice(0, redirectUrl.lastIndexOf('/')) : '/admin'
+      }, 100)
     }
 
-    const withYandex = authYandex && authYandex.enabled && authYandex.clientId;
-    const withGoogle = authGoogle && authGoogle.enabled && authGoogle.clientId;
+    const withYandex = authYandex && authYandex.enabled && authYandex.clientId
+    const withGoogle = authGoogle && authGoogle.enabled && authGoogle.clientId
 
     onMounted(async () => {
-      if(!props.yandexAccessToken || !withYandex) return;
+      if (!props.yandexAccessToken || !withYandex) return
 
-      loading.value = true;
+      loading.value = true
       try {
-        const res = await axios.post(apiUrl + `/tager/auth/admin/yandex`, {accessToken: props.yandexAccessToken});
-        if(res.data.data?.accessToken) {
-          onSuccess(res.data.data);
-        } else{
-          loading.value = false;
+        const res = await axios.post(apiUrl + `/tager/auth/admin/yandex`, {
+          accessToken: props.yandexAccessToken
+        })
+        if (res.data.data?.accessToken) {
+          onSuccess(res.data.data)
+        } else {
+          loading.value = false
         }
-      } catch (e:any) {
-        loading.value = false;
-        error.value = e.response?.data?.message || 'Unknown error';
+      } catch (e: any) {
+        loading.value = false
+        error.value = e.response?.data?.message || 'Unknown error'
       }
-    });
+    })
 
     return {
+      backgroundColor: colors.formBackground,
       loading,
       error,
       resetError,
       onSuccess,
       onError,
       isDark: theme === 'dark',
-      withYandex, withGoogle
+      withYandex,
+      withGoogle
     }
   }
 }
@@ -91,16 +101,11 @@ export default {
   width: 100%;
   padding: 1rem;
   margin: 0 auto;
-  background-color: #fff;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   gap: 0.8rem;
   position: relative;
-
-  &.dark{
-    background-color: #333;
-  }
 }
 
 .inner {
@@ -129,7 +134,6 @@ export default {
   }
 }
 
-
 @keyframes lds-ring {
   0% {
     transform: rotate(0deg);
@@ -139,15 +143,14 @@ export default {
   }
 }
 
-.loader{
+.loader {
   position: absolute;
   inset: 0;
-  background: rgba(0,0,0,.75);
+  background: rgba(0, 0, 0, 0.75);
   z-index: 2;
   display: flex;
   align-items: center;
   justify-content: center;
-
 
   div {
     box-sizing: border-box;
@@ -174,17 +177,12 @@ export default {
     animation-delay: -0.15s;
   }
 
-  &.light{
-    background: rgba(255,255,255,.75);
+  &.light {
+    background: rgba(255, 255, 255, 0.75);
 
-    div{
+    div {
       border-color: #333 transparent transparent transparent;
     }
   }
-
 }
-
-
-
-
 </style>

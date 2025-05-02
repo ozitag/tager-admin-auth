@@ -1,49 +1,51 @@
 <template>
-  <div class="page-inner">
+  <div class="page-inner" :style="{ backgroundColor }">
     <main class="page-main">
       <div class="wrapper">
         <div class="logo" v-if="logo">
-          <img :src="logo" alt="TAGER">
+          <img :src="logo" alt="TAGER" />
         </div>
-        <Form :yandex-access-token="yandexAccessToken"/>
+        <Form :yandex-access-token="yandexAccessToken" />
       </div>
     </main>
-    <Footer v-if="copyrightVisible"/>
+    <Footer v-if="copyrightVisible" />
   </div>
 </template>
 
 <script lang="ts">
-import {defineComponent, onMounted, ref} from 'vue';
+import { defineComponent, onMounted, ref } from 'vue'
 import Form from './Form/Form.vue'
 import Footer from './Footer/Footer.vue'
-import {useConfig} from './config';
+import { useConfig } from './config'
 
-const getYandexAccessToken = (): string|undefined => {
-  if(!window.location.hash.startsWith('#access_token='))return undefined;
-  return window.location.hash.substring('#access_token='.length, window.location.hash.indexOf('&'));
+const getYandexAccessToken = (): string | undefined => {
+  if (!window.location.hash.startsWith('#access_token=')) return undefined
+  return window.location.hash.substring('#access_token='.length, window.location.hash.indexOf('&'))
 }
 
 export default defineComponent({
   name: 'App',
   components: {
-    Form, Footer,
+    Form,
+    Footer
   },
   setup() {
-    const {copyright, logo, pageTitle, basePath,apiUrl} = useConfig();
-    const loading = ref<boolean>(false);
+    const { copyright, logo, pageTitle, basePath, colors } = useConfig()
+    const loading = ref<boolean>(false)
 
     onMounted(() => {
-      document.title = pageTitle;
-    });
+      document.title = pageTitle
+    })
 
     return {
+      backgroundColor: colors.bodyBackground,
       yandexAccessToken: getYandexAccessToken(),
       loading,
       copyrightVisible: copyright.visible,
-      logo: logo ? basePath + (basePath.endsWith('/') ? '' : '/') + logo : null,
-    };
+      logo: logo ? basePath + (basePath.endsWith('/') ? '' : '/') + logo : null
+    }
   }
-});
+})
 </script>
 
 <style>
@@ -87,7 +89,7 @@ body {
   margin-bottom: 30px;
   align-items: flex-end;
 
-  @media(max-width: 767px) {
+  @media (max-width: 767px) {
     max-width: 150px;
     margin: 0 auto 20px;
   }
@@ -106,7 +108,7 @@ body {
       max-height: 100px;
     }
 
-    @media(max-width: 767px) {
+    @media (max-width: 767px) {
       max-height: 100px;
       max-width: 200px;
     }
